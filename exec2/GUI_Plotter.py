@@ -35,7 +35,7 @@ class Plotter:
         self.y = []
         self.figure = plt.figure(figsize = (8,6), dpi=100)
         self.axes = self.figure.add_subplot()
-        self.line, = self.axes.plot(self.x, self.y, 'r', linewidth=0.5)
+        self.line = None
 
         # Config
         plt.style.use('fivethirtyeight')
@@ -43,6 +43,7 @@ class Plotter:
 
     def init_animation(self):
         """initializes plot"""
+        self.line, = self.axes.plot(self.x, self.y, 'r', linewidth=0.5)
         self.line.set_data(self.x, self.y)
         return self.line,
 
@@ -74,9 +75,8 @@ class Plotter:
     def plot(self, xlimit):
         """Sets up the data and plots it"""
         self.init_plot(xlimit)
-        self.axes.plot(self.x, self.y)
+        self.axes.plot(self.x, self.y, 'r', linewidth=0.5)
         plt.tight_layout()
-        plt.show()
 
 
 class GUI:
@@ -102,7 +102,7 @@ class GUI:
         self.root = Tk()
         self.main_frame = Frame(self.root)
         self.title = 'GUI Test'
-        self.entry_boxes = {}
+        self.entry_boxes = {self.main_frame: []}
 
         # GUI Objects
         self.menu_area = Menu(self.root)
@@ -114,31 +114,33 @@ class GUI:
         self.main_frame.pack(fill=BOTH, expand=1, padx=10, pady=10)
 
     def add_menu_item(self, label, command, last_item=False):
-        """blah"""
+        """Adds a menu item to the top menu"""
         self.menu_area.add_command(label=label, command=command)
         if last_item:
             self.menu_area.add_command(label='exit', command=self.root.destroy)
 
     def add_frame(self, bg):
-        """blah"""
+        """Creates a frame and returns it"""
         frame = Frame(self.root, bg=bg)
         frame.pack(padx=10, pady=10)
+        self.entry_boxes[frame] = []
         return frame
 
     def add_button(self, label, command, frame, bind_key=None):
-        """blah"""
+        """Creates a button"""
         button = Button(frame, text=label, command=command)
         button.pack(side=TOP, padx=10, pady=10, fill=BOTH)
         self.root.bind(bind_key, command)
 
     def add_entry_box(self, label, frame):
-        """blah"""
-        self.entry_boxes[label] = Entry(frame, width = 4)
+        """Creates an text box width a label"""
+        entry_box = Entry(frame, width = 4)
+        self.entry_boxes[frame].append(entry_box)
         Label(frame, text=label).pack(side=TOP, padx=10, pady=10)
-        self.entry_boxes[label].pack(side=TOP, padx=20, pady=10)
+        entry_box.pack(side=TOP, padx=20, pady=10)
 
     def main(self):
-        """blah"""
+        """Just a wrapper for root.mainloop"""
         self.root.mainloop()
 
 
@@ -198,12 +200,8 @@ class GUI_Plotter(GUI):
         self.add_menu_item(label='Exercise 2', command=self.show_main)
         self.add_menu_item(label='Exercise 2.1', command=self.show_sec, last_item=True)
         self.show_main()
-        self.create_canvas(self.main_frame, self.plotter_main)
         self.create_canvas(self.sec_frame, self.plotter_sec)
 
-    def main(self):
-        """A wrapper for root.mainloop"""
-        self.root.mainloop()
 
     def pause(self):
         """Pauses the animation if paused, starts it if not"""
@@ -217,17 +215,16 @@ class GUI_Plotter(GUI):
     def start(self):
         """Starts the animation and runs the tkinter mainloop"""
         self.started = True
-        self.update(self.plotter_sec)
+        self.update(self.plotter_sec, self.sec_frame)
         self.animation = self.plotter_sec.get_animation()
         self.root.mainloop()
 
-    def update(self, plotter_obj):
+    def update(self, plotter_obj, frame):
         """A simle helper function that updates the values and sets limits based on those"""
-        self.amp = float(self.entry_boxes['Amplitude'].get())
-        self.freq = float(self.entry_boxes['Frequency'].get())
+        self.amp = float(self.entry_boxes[frame][0].get())
+        self.freq = float(self.entry_boxes[frame][1].get())
         plotter_obj.axes.set_xlim([0, 1000])
         starting_val = self.func(1)
-        print(starting_val)
         plotter_obj.axes.set_ylim([starting_val-starting_val/(10**12),
                                          starting_val+starting_val/(10**12)])
 
@@ -254,10 +251,10 @@ class GUI_Plotter(GUI):
 
     def plot(self):
         """Plots data inside the canvas tkinter widget"""
-        self.update(self.plotter_main)
+        self.update(self.plotter_main, self.main_frame)
         self.plotter_main.plot(1000)
-
-
+        self.create_canvas(self.main_frame, self.plotter_main)
+        plt.show()
 
 
 
