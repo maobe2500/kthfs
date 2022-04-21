@@ -1,0 +1,4 @@
+<launch>
+  <include file='$(find package1)/launch/package1_publisher_node.launch'/>
+  <node pkg='package2' type='subscriber_node.py' name='Subscriber' output='screen'/>
+</launch>
