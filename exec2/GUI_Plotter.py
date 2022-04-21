@@ -10,18 +10,19 @@ class Plotter:
     A General Plotter that plots an arbitrary function
 
     Attributes:
-        func:
-        x:
-        y: List containing the values to plot
-        figure:
-        axes:
-        line:
+        func: The fucntion to plot
+        x: List containing the x values
+        y: List containing the y values
+        figure: Matplotlib figure object
+        axes: Axes for the plot
+        line: the plotted line used in animation
 
     Methods:
-        init:
-        get_animation:
-        animate:
-        plot:
+        init_animation: A neccecary function for the FuncAnimation to work
+        init_plot: Sets up the x and y lists
+        get_animation: runs the animation
+        animate: A neccecary function for FuncAnimation
+        plot: Plots the values in x and y lists
     """
 
     def __init__(self, func):
@@ -34,24 +35,24 @@ class Plotter:
         self.y = []
         self.figure = plt.figure(figsize = (8,6), dpi=100)
         self.axes = self.figure.add_subplot()
-        self.line, = self.axes.plot(self.x, self.y, 'r')
+        self.line, = self.axes.plot(self.x, self.y, 'r', linewidth=0.5)
 
         # Config
         plt.style.use('fivethirtyeight')
         plt.grid()
 
     def init_animation(self):
-        """blah"""
+        """initializes plot"""
         self.line.set_data(self.x, self.y)
         return self.line,
 
     def init_plot(self, xlimit):
-        """blah"""
+        """initializes value lists"""
         self.x = list(range(xlimit))
         self.y = [self.func(x) for x in self.x]
 
     def animate(self,i):
-        """blah"""
+        """Runs every frame of animation"""
         self.x = list(range(i))
         self.y = [self.func(x) for x in range(i)]
         self.line.set_data(self.x, self.y)
@@ -59,14 +60,19 @@ class Plotter:
 
 
     def get_animation(self):
-        """blah"""
+        """
+        Runs animation and returns the variabal.  
+        IMPORTANT:
+        The animation variable must be saved otherwise the 
+        animation gets garbage collected
+        """
         animation = FuncAnimation(self.figure, self.animate, 
                                   init_func=self.init_animation, interval=20,
                                   frames=1000, blit=True)
         return animation
 
     def plot(self, xlimit):
-        """blah"""
+        """Sets up the data and plots it"""
         self.init_plot(xlimit)
         self.axes.plot(self.x, self.y)
         plt.tight_layout()
@@ -96,7 +102,6 @@ class GUI:
         self.root = Tk()
         self.main_frame = Frame(self.root)
         self.title = 'GUI Test'
-        self.frames = [self.main_frame]
         self.entry_boxes = {}
 
         # GUI Objects
@@ -118,7 +123,7 @@ class GUI:
         """blah"""
         frame = Frame(self.root, bg=bg)
         frame.pack(padx=10, pady=10)
-        self.frames.append(frame)
+        return frame
 
     def add_button(self, label, command, frame, bind_key=None):
         """blah"""
@@ -177,8 +182,7 @@ class GUI_Plotter(GUI):
         self.func = lambda t : 3 * np.pi * np.exp(self.amp*np.sin(self.freq*np.pi*t))
         self.plotter_main = Plotter(self.func)
         self.plotter_sec = Plotter(self.func)
-        self.add_frame(bg='Green')
-        self.sec_frame = self.frames[1]
+        self.sec_frame = self.add_frame(bg='Green')
         self.started = False
         self.animation = None
         self.paused = False
