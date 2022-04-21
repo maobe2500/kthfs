@@ -4,9 +4,28 @@ The only dependency for exercise 1 is ros and rospy
 
 ## How to use
 - Use catkin build to initialize the workspace. 
-- Source the devel/setup.bash. 
-- Type roscore in another terminal.
-- Type roslaunch package2 package2_subscriber_node.launch
+	```
+	cd kthfs
+	catkin build
+	```
+- Source the setup.bash file from the devel folder 
+	```
+	source devel/setup.bash
+	```
+- Start roscore in another terminal.
+	```
+	roscore
+	```
+- Use the lanch file in package2 to start the subscriber node and publisher node
+	```
+	roslaunch package2 package2_subscriber_node.launch
+	```
+
+After the last step you should see this being printed to the terminal
+```
+[INFO] [1650568812.225029]: 352
+[INFO] [1650568812.226927]: publishing 2346.66666667 to /kthfs/result
+```
 
 # Exercise 2
 ## Dependencies:
