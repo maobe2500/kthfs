@@ -3,6 +3,7 @@ import rospy
 from std_msgs.msg import Float32
 
 def publish_nums(n=4):
+    """A publisher node publishing a float32 k increased by n=4 each iteration"""
     pub = rospy.Publisher('/Oberg', Float32, queue_size=10)
     rospy.init_node('publisher_node', anonymous=True)
     rate = rospy.Rate(20)

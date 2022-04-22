@@ -17,6 +17,7 @@ def publish_result(data, q=0.15):
 
 
 def listener():
+    """A Subscriber node that caclulates a result based on what is publihsed to /Oberg"""
     rospy.init_node('Subscriber_node', anonymous=True)
     rospy.Subscriber('/Oberg', Float32, publish_result)
     rospy.spin()
