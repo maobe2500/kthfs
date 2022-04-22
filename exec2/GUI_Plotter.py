@@ -179,6 +179,7 @@ class GUI_Plotter(GUI):
         super().__init__()
         self.amp = -5
         self.freq = 3
+        self.xmax = 1000
         self.x = []
         self.y = []
         self.func = lambda t : 3 * np.pi * np.exp(self.amp*np.sin(self.freq*np.pi*t))
@@ -221,12 +222,19 @@ class GUI_Plotter(GUI):
 
     def update(self, plotter_obj, frame):
         """A simle helper function that updates the values and sets limits based on those"""
-        self.amp = float(self.entry_boxes[frame][0].get())
-        self.freq = float(self.entry_boxes[frame][1].get())
-        plotter_obj.axes.set_xlim([0, 1000])
-        starting_val = self.func(1)
-        plotter_obj.axes.set_ylim([starting_val-starting_val/(10**12),
-                                         starting_val+starting_val/(10**12)])
+        try:
+            self.amp = float(self.entry_boxes[frame][0].get())
+            self.freq = float(self.entry_boxes[frame][1].get())
+        except ValueError:
+            print(f'Running plot with standard values Amplitude: {self.amp}, Frequency: {self.freq}')
+            pass
+        plotter_obj.axes.set_xlim([0, self.xmax])
+        end_vals = [self.func(x) for x in np.arange(self.xmax - self.xmax/10, self.xmax)]
+        max_val = max(np.abs(max(end_vals)), np.abs(min(end_vals)))
+        start_val = self.func(1)
+        print(max_val, start_val)
+        plotter_obj.axes.set_ylim(ymin=start_val-max_val/(10**11),
+                                  ymax=start_val+max_val/(10**11))
 
     def create_canvas(self, frame, plotter_obj):
         """A helper function that sets up a canvas where the plot is drawn"""
